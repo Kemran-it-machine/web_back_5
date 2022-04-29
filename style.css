@@ -1,0 +1,21 @@
+body
+{
+    text-align: center;
+    background-image: url(https://funart.pro/uploads/posts/2021-04/thumbs/1618470823_17-funart_pro-p-oboi-fon-sploshnoi-fon-17.png);
+    
+
+}
+form
+{
+    background: #00e0ff;
+    background: linear-gradient(45deg,#00e0ff 10%, #7ebf7e 50%);
+    background: -webkit-linear-gradient(45deg,#00e0ff 10%, #7ebf7e 50%);
+    background: -moz-linear-gradient(45deg,#00e0ff 10%, #7ebf7e 50%);
+    border-radius: 10px;
+    width: 300px;
+    margin: auto;
+    border: 1px solid rgb(131, 13, 13);
+    box-shadow: 76px 1px 17px -16px rgba(0,0,0,0.59);
+    -webkit-box-shadow: 76px 1px 17px -16px rgba(0,0,0,0.59);
+    -moz-box-shadow: 76px 1px 17px -16px rgba(0,0,0,0.59);
+}
