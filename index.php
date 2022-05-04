@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <meta name = "viewpoint" content = "width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="#" type="image/x-icon">
         <link rel = "stylesheet" href = "style.css">
         <title> Web_Backend3 </title>
     </head>

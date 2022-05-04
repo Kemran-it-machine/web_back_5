@@ -12,10 +12,10 @@ form
     background: -webkit-linear-gradient(45deg,#00e0ff 10%, #7ebf7e 50%);
     background: -moz-linear-gradient(45deg,#00e0ff 10%, #7ebf7e 50%);
     border-radius: 10px;
-    width: 300px;
+    width: 400px;
     margin: auto;
     border: 1px solid rgb(131, 13, 13);
-    box-shadow: 76px 1px 17px -16px rgba(0,0,0,0.59);
-    -webkit-box-shadow: 76px 1px 17px -16px rgba(0,0,0,0.59);
-    -moz-box-shadow: 76px 1px 17px -16px rgba(0,0,0,0.59);
+    box-shadow: -5px -2px 120px 37px rgba(0,0,0,0.75);
+-webkit-box-shadow: -5px -2px 120px 37px rgba(0,0,0,0.75);
+-moz-box-shadow: -5px -2px 120px 37px rgba(0,0,0,0.75);
 }
