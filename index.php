@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
   // Выдаем сообщение об успешном сохранении.
   if (!empty($_COOKIE['save'])) {
     // Удаляем куку, указывая время устаревания в прошлом.
-    setcookie('save', '', 100000);
+    setcookie('save', '', 1);
     // Если есть параметр save, то выводим сообщение пользователю.
     $messages['save'] = 'Спасибо, результаты сохранены.';
   }
@@ -37,37 +37,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
   // Выдаем сообщения об ошибках.
   if ($errors['name']) {
     // Удаляем куку, указывая время устаревания в прошлом.
-    setcookie('name_error', '', 100000);
+    setcookie('name_error', '', 1);
     // Выводим сообщение.
-    $messages['name_message'] = '<div class="error">Заполните имя. <br> Поле может быть заполнено символами <strong> ТОЛЬКО </strong> латинского или русского алфавитов. </div>';
+    $messages['name_message'] = '<div class="error">Заполните имя. <br> Вводите символы только латинского или русского алфавитов. </div>';
   }
   if ($errors['email']) {
-    setcookie('email_error', '', 100000);
-    $messages['email_message'] = '<div class="error">Заполните e-mail. <br> Поле может быть заполнено символами <strong> ТОЛЬКО </strong> латинского алфавита, цифрами и знаками: "@", "-", "_". </div>';
+    setcookie('email_error', '', 1);
+    $messages['email_message'] = '<div class="error">Заполните e-mail. <br> Вводите символы  только латинского алфавита, цифры и знаки: "@", "-", "_". </div>';
   }
   if ($errors['year']) {
-    setcookie('year_error', '', 100000);
+    setcookie('year_error', '', 1);
     $messages['year_message'] = '<div class="error"> Выберите год рождения. </div>';
   }
   if ($errors['sex']) {
-    setcookie('sex_error', '', 100000);
+    setcookie('sex_error', '', 1);
     $messages['sex_message'] = '<div class="error"> Выберите пол. </div>';
   }
   if ($errors['limbs']) {
-    setcookie('limbs_error', '', 100000);
+    setcookie('limbs_error', '', 1);
     $messages['limbs_message'] = '<div class="error"> Выберите количество конечностей. </div>';
   }
   if ($errors['powers']) {
-    setcookie('powers_error', '', 100000);
+    setcookie('powers_error', '', 1);
     $messages[] = '<div class="error"> Выберите хотя бы одну суперспособность. </div>';
   }
   if ($errors['biography']) {
-    setcookie('biography_error', '', 100000);
+    setcookie('biography_error', '', 1);
     $messages['biography_message'] = '<div class="error"> Расскажите что-нибудь о себе! </div>';
   }
   if ($errors['agree']) {
-    setcookie('agree_error', '', 100000);
-    $messages['agree_message'] = '<div class="error"> Прежде чем отправлять форму, ознакомьтесь с контрактом. </div>';
+    setcookie('agree_error', '', 1);
+    $messages['agree_message'] = '<div class="error">  Ознакомьтесь с контрактом. </div>';
   }
   // Складываем предыдущие значения полей в массив, если есть.
   $values = array();
@@ -80,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
   $values['biography'] = empty($_COOKIE['biography_value']) ? '' : $_COOKIE['biography_value'];
   $values['agree'] = empty($_COOKIE['agree_value']) ? '' : $_COOKIE['agree_value'];
 
-//????
   $powers = array(
     'immortal' => "Бессметрие",
     'walls' => "Прохождение сквозь стены",
@@ -95,8 +94,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
       }
     }
   }
-//??????
-
   // Включаем содержимое файла form.php.
   // В нем будут доступны переменные $messages, $errors и $values для вывода 
   // сообщений, полей с ранее заполненными данными и признаками ошибок.
@@ -195,14 +192,14 @@ else {
   }
   else {
     // Удаляем Cookies с признаками ошибок.
-    setcookie('name_error', '', 100000);
-    setcookie('email_error', '', 100000);
-    setcookie('year_error', '', 100000);
-    setcookie('sex_error', '', 100000);
-    setcookie('limbs_error', '', 100000);
-    setcookie('powers_error', '', 100000);
-    setcookie('biography_error', '', 100000);
-    setcookie('agree_error', '', 100000);
+    setcookie('name_error', '', 1);
+    setcookie('email_error', '', 1);
+    setcookie('year_error', '', 1);
+    setcookie('sex_error', '', 1);
+    setcookie('limbs_error', '', 1);
+    setcookie('powers_error', '', 1);
+    setcookie('biography_error', '', 1);
+    setcookie('agree_error', '', 1);
   }
 
   // Сохранение в БД.
@@ -216,8 +213,8 @@ else {
 	$biography = htmlspecialchars($_POST['biography']);
 
 	$serverName = 'localhost';
-	$user = "u47555";
-	$pass = "5390911";
+	$user = "u47669";
+	$pass = "7643625";
 	$dbName = $user;
 
 	$db = new PDO("mysql:host=$serverName;dbname=$dbName", $user, $pass, array(PDO::ATTR_PERSISTENT => true));
