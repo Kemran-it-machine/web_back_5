@@ -1,96 +1,106 @@
-<?php
-// Отправляем браузеру правильную кодировку,
-// файл index.php должен быть в кодировке UTF-8 без BOM.
-header('Content-Type: text/html; charset=UTF-8');
-// Запрос был методом POST, т.е. нужно проверить данные и сохранить их в XML-файл.
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="#" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <title> Web_Backend_4 </title>
+  </head>
 
-// Проверяем ошибки. 
-if (!empty($_POST)) {
-	if (empty($_POST["name"])) {
-		$errors[] = "Введите имя!";
-	}
-	if (empty($_POST["email"])) {
-		$errors[] = "Введите e-mail!";
-	}
-	if (empty($_POST["year"])) {
-		$errors[] = "Выберите год рождения!";
-	}
-	if (!isset($_POST["sex"])) {
-		$errors[] = "Выберите пол!";
-	}
-	if (!isset($_POST["limbs"])) {
-		$errors[] = "Выберите кол-во конечностей!";
-	}
-	if (!isset($_POST["superpowers"])) {
-		$errors[] = "Выберите хотя бы одну суперспособность!";
-	}
-	if (empty($_POST["biography"])) {
-		$errors[] = "Расскажите что-нибудь о себе!";
-	}
-} else {
-	$errors[] = "Неверные данные формы!";
-}
-//Завершаем работу скрипта при наличии ошибок ( и выводим причину )
-if (isset($errors)) {
-	foreach ($errors as $value) {
-		echo "$value<br>";
-	}
-	exit();
-}
+  <body>
+    <h1> Добро пожаловать </h1>
+    <?php
+    if (!empty($messages)) {
+      if (isset($messages['save']))
+        print('<div id="messages" class="ok">');
+      else print('<div id="messages">');
+      foreach ($messages as $message) {
+        print($message);
+      }
+      print('</div>');
+    }
+    ?>
+    <div class = "container">
+    <form action="" method="POST" >
+      <p>
+        <label>
+          <strong> Имя: </strong> <br> <br>
+          <input  name="name" placeholder = "Введите Ваше имя." 
+            <?php if (!empty($errors['name'])) {
+              print 'class="error"';} ?> 
+            <?php if(empty($errors['name'])&&!empty($values['name'])) 
+              print 'class="ok"';?> 
+            value = "<?php isset($_COOKIE['name_error'])? print trim($_COOKIE['name_error']) : print $values['name']; ?>">
+        </label>
+      </p>
+      <p>
+        <label>
+          <strong> E-mail: </strong> <br> <br>
+          <input name="email" placeholder="Введите Ваш E-mail" type="text" 
+            <?php if(!empty($errors['email']))  
+              print 'class="error"';?> 
+            <?php if(empty($errors['email'])&&!empty($values['email'])) 
+              print 'class="ok"';?>
+            value="<?php isset($_COOKIE['email_error'])? print trim($_COOKIE['email_error']) : print $values['email']; ?>">
+        </label>
+      </p>
+      <p>
+        <label>
+          <strong> Год рождения </strong> <br> <br>
+          <select name="year" 
+            <?php if(!empty($errors['year']))  
+              print 'class="error"';?> 
+            <?php if(empty($errors['year'])&&!empty($values['year'])) 
+              print 'class="ok"';?>>
+              <option selected value="<?php !empty($values['year']) ? print ($values['year']) : print '' ?>"></option> // возможно нужно поставить selected
+                <?php
+                for ($i = 2004; $i >= 1920; $i--) {
+                  echo "<option value = '$i'> $i </option>";
+                }
+                ?>
+          </select>
+        </label>
+      </p>
+      <p>
+        <label <?php if(!empty($errors['sex'])) print 'class="error_check"'?>> 
+          <strong> Пол </strong> <br> <br>
+          <input type="radio" name="sex" value="male" <?php if (isset($values['sex'])&&$values['sex'] == 'male') print("checked"); ?>> Мужской <br> <br>
+          <input type="radio" name="sex" value="female" <?php if (isset($values['sex'])&&$values['sex'] == 'female') print("checked"); ?>> Женский <br>
+        </label>
+      </p>
+      <p>
+        <label <?php if(isset($_COOKIE['limbs_error'])) print 'class="error_check"'?>>
+          <strong> Количество конечностей </strong> <br> <br>
+          <input type="radio" name="limbs" value="1" <?php if (isset($values['limbs'])&&$values['limbs'] == '1') print("checked"); ?>> 1
+          <input type="radio" name="limbs" value="2" <?php if (isset($values['limbs'])&&$values['limbs'] == '2') print("checked"); ?>> 2
+          <input type="radio" name="limbs" value="3" <?php if (isset($values['limbs'])&&$values['limbs'] == '3') print("checked"); ?>> 3
+          <input type="radio" name="limbs" value="4" <?php if (isset($values['limbs'])&&$values['limbs'] == '4') print("checked"); ?>> 4
+        </label>
+      </p>
+      <p>
+        <label <?php if(!empty($errors['powers'])) print 'class="error_check"'?>> <strong> Сверхспособности: </strong> </label> <br> <br>
+        <select multiple name="powers[]">
+          <option value="immortal" <?php if(isset($values['powers']['immortal'])&&$values['powers']['immortal']=='immortal') print("checked");?>> Бессмертие </option>
+          <option value="walls" <?php if(isset($values['powers']['walls'])&&$values['powers']['walls']=='walls') print("checked");?>> Прохождение сквозь стены </option>
+          <option value="levitaion" <?php if(isset($values['powers']['levitation'])&&$values['powers']['levitation']=='levitation') print("checked");?>> Левитация </option>
+        </select>
+      </p>
+      <p>
+        <label>
+          <strong> Биография: </strong> <br> <br>
+          <textarea id="biography" name="biography" <?php if(!empty($errors['biography']))  print 'class="error"';?> <?php if(empty($errors['biography'])&&!empty($values['biography'])) print 'class="ok"';?>><?php isset($_COOKIE['biography_error']) ? print trim($_COOKIE['biography_error']) : print $values['biography'] ?></textarea>
+        </label>
+      </p>  
+      <p>
+        <label <?php if(!empty($errors['agree'])) print 'class="error_check"'?>>
+          <input type="checkbox" name="agree" value = "agree" <?php if (isset($values['agree'])&&$values['agree'] == 'agree') print("checked"); ?>> <strong> С контрактом ознакомлен(-а) </strong>
+        </label>
+      </p>
+      <p>
+        <input class="button" type="submit" value="Отправить">
+      </p>
+    </form>
+              </div>
+  </body>
 
-// Сохранение в базу данных.
-
-$name = htmlspecialchars($_POST["name"]);
-$email = htmlspecialchars($_POST["email"]);
-$year = intval(htmlspecialchars($_POST["year"]));
-$sex = htmlspecialchars($_POST["sex"]);
-$limbs = intval(htmlspecialchars($_POST["limbs"]));
-$superPowers = $_POST["superpowers"];
-$biography = htmlspecialchars($_POST["biography"]);
-if (!isset($_POST["agree"])) {
-	$agree = 0;
-} else {
-	$agree = 1;
-}
-
-$serverName = "localhost";
-$user = 'u47669';
-$pass = '7643625';
-$dbName = $user;
-$db = new PDO("mysql:host=$serverName;dbname=$dbName", $user, $pass, array(PDO::ATTR_PERSISTENT => true));
-$lastId = null;
-// Подготовленный запрос. Не именованные метки.
-/*
-try {
-  $stmt = $db->prepare("INSERT INTO application (name) SET name = ?");
-  $stmt -> execute(array('fio'));
-}
-catch(PDOException $e){
-  print('Error : ' . $e->getMessage());
-  exit();
-}
-*/
-
-try {
-	$stmt = $db->prepare("INSERT INTO user (name, email, date, sex, limbs, biography, agreement) VALUES (:name, :email, :date, :sex, :limbs, :biography, :agreement)");
-	$stmt->execute(array('name' => $name, 'email' => $email, 'date' => $year, 'sex' => $sex, 'limbs' => $limbs, 'biography' => $biography, 'agreement' => $agree));
-	$lastId = $db->lastInsertId();
-} catch (PDOException $e) {
-	print('Error : ' . $e->getMessage());
-	exit();
-}
-
-try {
-	if ($lastId === null) {
-		exit();
-	}
-	foreach ($superPowers as $value) {
-		$stmt = $db->prepare("INSERT INTO user_power (id, power) VALUES (:id, :power)");
-		$stmt->execute(array('id' => $lastId, 'power' => $value));
-	}
-} catch (PDOException $e) {
-	print('Error : ' . $e->getMessage());
-	exit();
-}
-$db = null;
-echo "Данные сохранены и отправлены!";
+</html>
