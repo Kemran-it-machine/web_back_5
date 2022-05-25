@@ -1,251 +1,300 @@
 <?php
-/**
- * Реализовать проверку заполнения обязательных полей формы в предыдущей
- * с использованием Cookies, а также заполнение формы по умолчанию ранее
- * введенными значениями.
- */
-
-// Отправляем браузеру правильную кодировку,
-// файл index.php должен быть в кодировке UTF-8 без BOM.
 header('Content-Type: text/html; charset=UTF-8');
 
-// В суперглобальном массиве $_SERVER PHP сохраняет некторые заголовки запроса HTTP
-// и другие сведения о клиненте и сервере, например метод текущего запроса $_SERVER['REQUEST_METHOD'].
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-  // Массив для временного хранения сообщений пользователю.
+  $user = 'u47669';
+  $pass = '7643625';
+  $db = new PDO('mysql:host=localhost;dbname=u47669', $user, $pass, array(PDO::ATTR_PERSISTENT => true));
+
+  if ($_SERVER['REQUEST_METHOD'] == 'GET') {
   $messages = array();
-
-  // В суперглобальном массиве $_COOKIE PHP хранит все имена и значения куки текущего запроса.
-  // Выдаем сообщение об успешном сохранении.
   if (!empty($_COOKIE['save'])) {
-    // Удаляем куку, указывая время устаревания в прошлом.
+ 
     setcookie('save', '', 1);
-    // Если есть параметр save, то выводим сообщение пользователю.
-    $messages['save'] = 'Спасибо, результаты сохранены.';
+    setcookie('login', '', 1);
+    setcookie('pass', '', 1);
+    $messages[] = 'Спасибо, результаты сохранены.<br>';
+    if (!empty($_COOKIE['pass'])) {
+      $messages[] = sprintf('Вы можете <a href="login.php">войти</a> с логином <strong>%s</strong>
+        и паролем <strong>%s</strong> для изменения данных.',
+        strip_tags($_COOKIE['login']),
+        strip_tags($_COOKIE['pass']));
+    }
   }
-
-  // Складываем признак ошибок в массив.
+  
   $errors = array();
   $errors['name'] = !empty($_COOKIE['name_error']);
   $errors['email'] = !empty($_COOKIE['email_error']);
   $errors['year'] = !empty($_COOKIE['year_error']);
-  $errors['sex'] = !empty($_COOKIE['sex_error']);
-  $errors['limbs'] = !empty($_COOKIE['limbs_error']);
-  $errors['powers'] = !empty($_COOKIE['powers_error']);
-  $errors['biography'] = !empty($_COOKIE['biography_error']);
-  $errors['agree'] = !empty($_COOKIE['agree_error']);
-  // Выдаем сообщения об ошибках.
+  $errors['gender'] = !empty($_COOKIE['gender_error']);
+  $errors['kon'] = !empty($_COOKIE['kon_error']);
+  $errors['super'] = !empty($_COOKIE['super_error']);
+  $errors['bio'] = !empty($_COOKIE['bio_error']);
+  $errors['contr_check'] = !empty($_COOKIE['contr_check_error']);
+
   if ($errors['name']) {
-    // Удаляем куку, указывая время устаревания в прошлом.
     setcookie('name_error', '', 1);
-    // Выводим сообщение.
-    $messages['name_message'] = '<div class="error">Заполните имя. <br> Вводите символы только латинского или русского алфавитов. </div>';
+    $messages['name_message'] = '<div class="error">Заполните имя.<br>Поле может быть заполнено символами только русского или только английского алфавитов</div>';
   }
   if ($errors['email']) {
     setcookie('email_error', '', 1);
-    $messages['email_message'] = '<div class="error">Заполните e-mail. <br> Вводите символы  только латинского алфавита, цифры и знаки: "@", "-", "_". </div>';
+    $messages['email_message'] = '<div class="error">Заполните e-mail.<br>Поле может быть заполнено только символами английского алфавита, цифрами и знаком "@"</div>';
   }
   if ($errors['year']) {
     setcookie('year_error', '', 1);
-    $messages['year_message'] = '<div class="error"> Выберите год рождения. </div>';
+    $messages['year_message'] = '<div class="error">Выберите год рождения</div>';
   }
-  if ($errors['sex']) {
-    setcookie('sex_error', '', 1);
-    $messages['sex_message'] = '<div class="error"> Выберите пол. </div>';
+  if ($errors['gender']) {
+    setcookie('gender_error', '', 1);
+    $messages['gender_message'] = '<div class="error">Укажите ваш пол</div>';
   }
-  if ($errors['limbs']) {
-    setcookie('limbs_error', '', 1);
-    $messages['limbs_message'] = '<div class="error"> Выберите количество конечностей. </div>';
+  if ($errors['kon']) {
+    setcookie('kon_error', '', 1);
+    $messages['kon_message'] = '<div class="error">Веберите количество конечностей</div>';
   }
-  if ($errors['powers']) {
-    setcookie('powers_error', '', 1);
-    $messages[] = '<div class="error"> Выберите хотя бы одну суперспособность. </div>';
+  if ($errors['super']) {
+    setcookie('super_error', '', 1);
+    $messages[] = '<div class="error">Веберите хотя бы одну сверхспособность</div>';
   }
-  if ($errors['biography']) {
-    setcookie('biography_error', '', 1);
-    $messages['biography_message'] = '<div class="error"> Расскажите что-нибудь о себе! </div>';
+  if ($errors['bio']) {
+    setcookie('bio_error', '', 1);
+    $messages['bio_message'] = '<div class="error">Расскажите о себе</div>';
   }
-  if ($errors['agree']) {
-    setcookie('agree_error', '', 1);
-    $messages['agree_message'] = '<div class="error">  Ознакомьтесь с контрактом. </div>';
+  if ($errors['contr_check']) {
+    setcookie('contr_check_error', '', 1);
+    $messages['contr_check_message'] = '<div class="error">Вы не можете отправить форму, не ознакомившись с контрактом</div>';
   }
-  // Складываем предыдущие значения полей в массив, если есть.
+
   $values = array();
   $values['name'] = empty($_COOKIE['name_value']) ? '' : $_COOKIE['name_value'];
   $values['email'] = empty($_COOKIE['email_value']) ? '' : $_COOKIE['email_value'];
   $values['year'] = empty($_COOKIE['year_value']) ? '' : $_COOKIE['year_value'];
-  $values['sex'] = empty($_COOKIE['sex_value']) ? '' : $_COOKIE['sex_value'];
-  $values['limbs'] = empty($_COOKIE['limbs_value']) ? '' : $_COOKIE['limbs_value'];
-  $values['powers'] = []; // сделали массивом
-  $values['biography'] = empty($_COOKIE['biography_value']) ? '' : $_COOKIE['biography_value'];
-  $values['agree'] = empty($_COOKIE['agree_value']) ? '' : $_COOKIE['agree_value'];
-
-  $powers = array(
-    'immortal' => "Бессметрие",
-    'walls' => "Прохождение сквозь стены",
-    'levitation' => "Левитация",
+  $values['gender'] = empty($_COOKIE['gender_value']) ? '' : $_COOKIE['gender_value'];
+  $values['kon'] = empty($_COOKIE['kon_value']) ? '' : $_COOKIE['kon_value'];
+  $values['super'] = [];
+  $values['bio'] = empty($_COOKIE['bio_value']) ? '' : $_COOKIE['bio_value'];
+  $values['contr_check'] = empty($_COOKIE['contr_check_value']) ? '' : $_COOKIE['contr_check_value'];
+  
+  $super = array(
+    '1' => "1",
+    '2' => "2",
+    '3' => "3",
   );
-  if (!empty($_COOKIE['powers_value'])){
-    $powers_value = unserialize($_COOKIE['powers_value']);
-    foreach ( $powers_value as $p )
-    {
-      if ( !empty($powers[$p])) {
-        $values['powers'][$p] = $p;
+  
+  if(!empty($_COOKIE['super_value'])) {
+    $super_value = unserialize($_COOKIE['super_value']);
+    foreach ($super_value as $s) {
+      if (!empty($super[$s])) {
+          $values['super'][$s] = $s;
       }
     }
   }
-  // Включаем содержимое файла form.php.
-  // В нем будут доступны переменные $messages, $errors и $values для вывода 
-  // сообщений, полей с ранее заполненными данными и признаками ошибок.
+
+  if (!empty($_COOKIE[session_name()]) &&
+  session_start() && !empty($_SESSION['login'])) {
+    // загружаем данные пользователя из БД
+    // и заполняем переменную $values
+    try{
+      $sth = $db->prepare("SELECT id FROM users5 WHERE login = ?");
+      $sth->execute(array($_SESSION['login']));
+      $user_id = ($sth->fetchAll(PDO::FETCH_COLUMN, 0))['0']; 
+      $sth = $db->prepare("SELECT * FROM application5 WHERE id = ?");
+      $sth->execute(array($user_id));
+      $user_data = ($sth->fetchAll(PDO::FETCH_ASSOC))['0']; 
+
+      foreach ($user_data as $key=>$val){
+        $values[$key] = $val;
+      }
+      $values['super'] = [];
+      $super_value = unserialize($_COOKIE['super_value']);
+        foreach ($super_value as $s) {
+            if (!empty($super[$s])) {
+                $values['super'][$s] = $s;
+            }
+        }
+
+      } 
+      catch(PDOException $e) {
+          print($e->getMessage());
+          exit();
+      }
+  }
   include('form.php');
 }
-// Иначе, если запрос был методом POST, т.е. нужно проверить данные и сохранить их в XML-файл.
+
 else {
-  // Проверяем ошибки.
   $errors = FALSE;
-  //name
-  if (empty($_POST['name'])) {
-    // Выдаем куку на день с флажком об ошибке в поле fio.
+if (empty($_POST['name'])) {
     setcookie('name_error', ' ', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
-  else if (!preg_match("/^\s*[a-zA-Zа-яА-Я'][a-zA-Zа-яА-Я-' ]+[a-zA-Zа-яА-Я']?\s*$/u", $_POST['name'])){
-    setcookie('name_error', ' ', time() + 24 * 60 * 60);
+  else if(!preg_match("/^[а-яё]|[a-z]$/iu", $_POST['name'])){
+    setcookie('name_error', $_POST['name'], time() + 24 * 60 * 60);
     $errors = TRUE;
   }
   else {
-    // Сохраняем ранее введенное в форму значение на месяц.
     setcookie('name_value', $_POST['name'], time() + 30 * 24 * 60 * 60);
   }
-  //email
-  if (empty($_POST['email'])) {
+  if (empty($_POST['email'])){
     setcookie('email_error', ' ', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
-  else if (!preg_match("/^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+.[a-zA-Z.]{2,5}$/", $_POST['email'])){
-    setcookie('email_error', ' ', time() + 24 * 60 * 60);
+  else if(!preg_match("/^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+.[a-zA-Z.]{2,5}$/", $_POST['email'])){
+    setcookie('email_error', $_POST['email'], time() + 24 * 60 * 60);
     $errors = TRUE;
   }
   else {
     setcookie('email_value', $_POST['email'], time() + 30 * 24 * 60 * 60);
   }
-  //year
-  if (empty($_POST['year'])) {
+  if ($_POST['year']=='') {
     setcookie('year_error', ' ', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
   else {
     setcookie('year_value', $_POST['year'], time() + 30 * 24 * 60 * 60);
   }
-  //sex
-  if (empty($_POST['sex'])) {
-    setcookie('sex_error', ' ', time() + 24 * 60 * 60);
-    $errors = TRUE;
-  }
-  else {
-    setcookie('sex_value', $_POST['sex'], time() + 30 * 24 * 60 * 60);
-  }
-  //limbs
-  if (empty($_POST['limbs'])) {
-    setcookie('limbs_error', ' ', time() + 24 * 60 * 60);
-    $errors = TRUE;
-  }
-  else {
-    setcookie('limbs_value', $_POST['limbs'], time() + 30 * 24 * 60 * 60);
-  }
-  //powers
-  if(empty($_POST['powers'])){
-    setcookie('powers_error', ' ', time() + 24 * 60 * 60);
-    setcookie('powers_value', '', time() + 24 * 60 * 60);
+
+  if (empty($_POST['gender'])) {
+    setcookie('gender_error', ' ', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
   else{
-    foreach ($_POST['powers'] as $key => $value) {
-      $powers[$key] = $value;
+  setcookie('gender_value', $_POST['gender'], time() + 30 * 24 * 60 * 60);
+  }
+  if (empty($_POST['kon'])) {
+    setcookie('kon_error', ' ', time() + 24 * 60 * 60);
+    $errors = TRUE;
+  }
+  else {
+    setcookie('kon_value', $_POST['kon'], time() + 30 * 24 * 60 * 60);
+  }
+  $super=array();
+  if(empty($_POST['super'])){
+    setcookie('super_error', ' ', time() + 24 * 60 * 60);
+    $errors = TRUE;
+  }
+  else{
+    foreach ($_POST['super'] as $key => $value) {
+      $super[$key] = $value;
     }
-    setcookie('powers_value', serialize($powers), time() + 30 * 24 * 60 * 60);
+    setcookie('super_value', serialize($super), time() + 30 * 24 * 60 * 60);
   }
-  //biography
-  if (empty($_POST['biography'])) {
-    setcookie('biography_error', ' ', time() + 24 * 60 * 60);
+  if (empty($_POST['bio'])) {
+    setcookie('bio_error', ' ', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
   else {
-    setcookie('biography_value', $_POST['biography'], time() + 30 * 24 * 60 * 60);
-  }
-  //agree
-  if (empty($_POST['agree'])) {
-    setcookie('agree_error', ' ', time() + 24 * 60 * 60);
-    setcookie('agree_value', '', time() + 24 * 60 * 60);
-    $errors = TRUE;
-  }
-  else {
-    setcookie('agree_value', $_POST['agree'], time() + 30 * 24 * 60 * 60);
+    setcookie('bio_value', $_POST['bio'], time() + 30 * 24 * 60 * 60);
   }
 
-// Сохранить в Cookie признаки ошибок и значения полей.`
+  if (empty($_POST['contr_check'])) {
+    setcookie('contr_check_error', ' ', time() + 24 * 60 * 60);
+    setcookie('contr_check_value', '', time() + 24 * 60 * 60);
+    $errors = TRUE;
+  }
+  else {
+    setcookie('contr_check_value', $_POST['contr_check'], time() + 30 * 24 * 60 * 60);
+  }
 
   if ($errors) {
-    // При наличии ошибок перезагружаем страницу и завершаем работу скрипта.
     header('Location: index.php');
     exit();
   }
   else {
-    // Удаляем Cookies с признаками ошибок.
-    setcookie('name_error', '', 1);
-    setcookie('email_error', '', 1);
-    setcookie('year_error', '', 1);
-    setcookie('sex_error', '', 1);
-    setcookie('limbs_error', '', 1);
-    setcookie('powers_error', '', 1);
-    setcookie('biography_error', '', 1);
-    setcookie('agree_error', '', 1);
+    setcookie('name_error', '', 100000);
+    setcookie('email_error', '', 100000);
+    setcookie('year_error', '', 100000);
+    setcookie('gender_error', '', 100000);
+    setcookie('kon_error', '', 100000);
+    setcookie('super_error', '', 100000);
+    setcookie('bio_error', '', 100000);
+    setcookie('contr_check_error', '', 100000);
   }
 
-  // Сохранение в БД.
+  // Проверяем, меняются ли ранее сохраненные данные или отправляются новые.
+  if (!empty($_COOKIE[session_name()]) &&
+      session_start() && !empty($_SESSION['login'])) {
+    try {
+      $stmt = $db->prepare("SELECT id FROM users5 WHERE login =?");
+      $stmt -> execute(array($_SESSION['login'] ));
+      $user_id = ($stmt->fetchAll(PDO::FETCH_COLUMN))['0'];
 
-  $name = $_POST['name'];
-	$email = $_POST['email'];
-	$year = intval(htmlspecialchars($_POST['year']));
-	$sex = htmlspecialchars($_POST['sex']);
-	$limbs = intval(htmlspecialchars($_POST['limbs']));
-	$superPowers = $_POST['powers'];
-	$biography = htmlspecialchars($_POST['biography']);
+      $stmt = $db->prepare("UPDATE application5 SET name = ?, email = ?, year = ?, gender = ?, kon = ?, bio = ? WHERE id =?");
+      $stmt -> execute(array(
+          $_POST['name'],
+          $_POST['email'],
+          $_POST['year'],
+          $_POST['gender'],
+          $_POST['kon'],
+          $_POST['bio'],
+          $user_id,
+      ));
+      $sth = $db->prepare("DELETE FROM Superpowers5 WHERE id = ?");
+      $sth->execute(array($user_id));
+      $stmt = $db->prepare("INSERT INTO Superpowers5 SET id = ?, superpowers = ?");
+      foreach($_POST['super'] as $s){
+          $stmt -> execute(array(
+            $user_id,
+            $s,
+          ));
+        }
+      }
+    catch(PDOException $e){
+      print('Error: ' . $e->getMessage());
+      exit();
+    }
+  }
+  else {
+    $sth = $db->prepare("SELECT login FROM users5");
+    $sth->execute();
+    $login_array = $sth->fetchAll(PDO::FETCH_COLUMN);
+    $flag=true;
+    do{
+      $login = rand(1,1000);
+      $pass = rand(1,10000);
+      foreach($login_array as $key=>$value){
+        if($value == $login)
+          $flag=false;
+      }
+    }while($flag==false);
+    $hash = password_hash((string)$pass, PASSWORD_BCRYPT);
+    setcookie('login', $login);
+    setcookie('pass', $pass);
 
-	$serverName = 'localhost';
-	$user = "u47669";
-	$pass = "7643625";
-	$dbName = $user;
+    // Сохранение данных формы, логина и хеш пароля в базу данных.
+    try {
+      $stmt = $db->prepare("INSERT INTO application5 SET name = ?, email = ?, year = ?, gender = ?, kon = ?, bio = ?");//, login = ?, password = ?
+      $stmt -> execute(array(
+          $_POST['name'],
+          $_POST['email'],
+          $_POST['year'],
+          $_POST['gender'],
+          $_POST['kon'],
+          $_POST['bio'],
+        )
+      );
 
-	$db = new PDO("mysql:host=$serverName;dbname=$dbName", $user, $pass, array(PDO::ATTR_PERSISTENT => true));
-
-	$lastId = null;
-	try {
-		$stmt = $db->prepare("INSERT INTO user2 (name, email, date, sex, limbs, biography) VALUES (:name, :email, :date, :sex, :limbs, :biography)");
-		$stmt->execute(array('name' => $name, 'email' => $email, 'date' => $year, 'sex' => $sex, 'limbs' => $limbs, 'biography' => $biography));
-		$lastId = $db->lastInsertId();
-	} catch (PDOException $e) {
-		print('Error : ' . $e->getMessage());
-		exit();
-	}
-
-	try {
-		if ($lastId === null) {
-			exit();
-		}
-		foreach ($superPowers as $value) {
-			$stmt = $db->prepare("INSERT INTO user_power2 (id, power) VALUES (:id, :power)");
-			$stmt->execute(array('id' => $lastId, 'power' => intval($value)));
-		}
-	} catch (PDOException $e) {
-		print('Error : ' . $e->getMessage());
-		exit();
-	}
-	$db = null;
-
-  // Сохраняем куку с признаком успешного сохранения.
+      $id_db = $db->lastInsertId();
+      //реализация атомарности
+      $stmt = $db->prepare("INSERT INTO Superpowers5 SET id = ?, superpowers = ?");
+      foreach($_POST['super'] as $s){
+          $stmt -> execute(array(
+            $id_db,
+            $s,
+          ));
+        }
+      $stmt = $db->prepare("INSERT INTO users5 SET login = ?, pass = ?");
+      $stmt -> execute(array(
+          $login,
+          $hash,
+        )
+      );
+    }
+    catch(PDOException $e){
+      print('Error: ' . $e->getMessage());
+      exit();
+    }
+  }
+  
   setcookie('save', '1');
-
-  // Делаем перенаправление.
   header('Location: index.php');
 }
