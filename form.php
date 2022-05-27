@@ -62,6 +62,7 @@
 			</p>
 			
 			<p><button type="submit" value="send"> Отправить</button></p>
+			Уже отправляли форму? <a href="login.php"> <strong> Войдите </strong> </a><br> <br>
 
 		</form>
 		<?php if(!empty($_COOKIE[session_name()]) && !empty($_SESSION['login'])) print( '<div id="footer">Вход с логином ' . $_SESSION["login"]. '<br> <a href=login.php?do=logout> Выход</a><br></div>');?>
